@@ -7,6 +7,6 @@
 #
 ---
 include:
-  - board: seeeduino_xiao_ble
+  - board: nrf52840dk_nrf52840
     shield: cca
 #    snippet: zmk-usb-logging

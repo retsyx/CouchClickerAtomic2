@@ -1,0 +1,35 @@
+description: |
+  Waveshare 0.85" ScreenKeys. Each ScreenKey is a display (a
+  sitronix,st7735r node on a shared SPI bus, with its own chip select) and a
+  switch wired into the ZMK key matrix. Each press of a ScreenKey's switch
+  toggles the face shown on its display.
+
+compatible: "cca,screenkeys"
+
+properties:
+  reset-gpios:
+    type: phandle-array
+    description: |
+      Reset line shared by all ScreenKey displays (active low). It is pulsed
+      once before the display drivers start, which then reset each panel in
+      software. Do not also give it to the display nodes. Omit it when each
+      display node has its own reset-gpios.
+
+  pwms:
+    type: phandle-array
+    description: |
+      Backlight PWM shared by all ScreenKeys. Omit it when the backlights are
+      not controlled by the MCU.
+
+child-binding:
+  description: A single ScreenKey.
+  properties:
+    display:
+      type: phandle
+      required: true
+      description: The ScreenKey's display.
+
+    key-position:
+      type: int
+      required: true
+      description: ZMK key position (matrix transform index) of the ScreenKey's switch.

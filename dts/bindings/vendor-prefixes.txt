@@ -1,0 +1,3 @@
+# Device tree binding vendor prefix registry
+
+cca	Couch Clicker Atomic

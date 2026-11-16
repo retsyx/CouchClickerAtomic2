@@ -1,0 +1,140 @@
+/*
+ * Couch Clicker Atomic on the nRF52840 DK.
+ *
+ * All pins are assigned in the block below; change them there. Comments give
+ * the DK's Arduino header names. Pins the DK already uses are avoided: LEDs,
+ * buttons, UART0 (J-Link VCOM), QSPI flash, NFC and the 32 kHz crystal.
+ */
+
+#include <zephyr/dt-bindings/pwm/pwm.h>
+
+#include "../screenkey-panel.dtsi"
+
+/* Key matrix: 5 columns x 3 rows, col2row diodes. */
+#define CCA_COL0 &gpio0 3                           /* A0 */
+#define CCA_COL1 &gpio0 4                           /* A1 */
+#define CCA_COL2 &gpio0 28                          /* A2 */
+#define CCA_COL3 &gpio0 29                          /* A3 */
+#define CCA_COL4 &gpio0 30                          /* A4 */
+#define CCA_ROW0 &gpio1 1                           /* D0 */
+#define CCA_ROW1 &gpio1 2                           /* D1 */
+#define CCA_ROW2 &gpio1 3                           /* D2 */
+
+/* ScreenKey displays: shared SPI, DC, reset and backlight; one CS each. */
+#define SK_SCLK_PSEL NRF_PSEL(SPIM_SCK, 1, 15)      /* D13 */
+#define SK_DIN_PSEL NRF_PSEL(SPIM_MOSI, 1, 13)      /* D11 */
+#define SK_BL_PSEL NRF_PSEL(PWM_OUT0, 1, 6)         /* D5 */
+#define SK_DC &gpio1 14                             /* D12 */
+#define SK_RST &gpio1 7                             /* D6 */
+#define SK_CS0 &gpio1 12                            /* D10 */
+#define SK_CS1 &gpio1 11                            /* D9 */
+#define SK_CS2 &gpio1 10                            /* D8 */
+#define SK_CS3 &gpio1 8                             /* D7 */
+
+&kscan {
+    col-gpios
+        = <CCA_COL0 GPIO_ACTIVE_HIGH>
+        , <CCA_COL1 GPIO_ACTIVE_HIGH>
+        , <CCA_COL2 GPIO_ACTIVE_HIGH>
+        , <CCA_COL3 GPIO_ACTIVE_HIGH>
+        , <CCA_COL4 GPIO_ACTIVE_HIGH>
+        ;
+
+    row-gpios
+        = <CCA_ROW0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+        , <CCA_ROW1 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+        , <CCA_ROW2 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+        ;
+};
+
+&screenkeys {
+    reset-gpios = <SK_RST GPIO_ACTIVE_LOW>;
+    pwms = <&pwm1 0 PWM_USEC(50) PWM_POLARITY_NORMAL>;  /* 20 kHz */
+};
+
+&spi2 {
+    compatible = "nordic,nrf-spim";
+    status = "okay";
+    pinctrl-0 = <&screenkey_spi_default>;
+    pinctrl-1 = <&screenkey_spi_sleep>;
+    pinctrl-names = "default", "sleep";
+    cs-gpios
+        = <SK_CS0 GPIO_ACTIVE_LOW>
+        , <SK_CS1 GPIO_ACTIVE_LOW>
+        , <SK_CS2 GPIO_ACTIVE_LOW>
+        , <SK_CS3 GPIO_ACTIVE_LOW>
+        ;
+
+    screenkey_lcd0: lcd@0 {
+        compatible = "sitronix,st7735r";
+        reg = <0>;
+        cmd-data-gpios = <SK_DC GPIO_ACTIVE_LOW>;
+        SCREENKEY_PANEL_PROPERTIES
+    };
+
+    screenkey_lcd1: lcd@1 {
+        compatible = "sitronix,st7735r";
+        reg = <1>;
+        cmd-data-gpios = <SK_DC GPIO_ACTIVE_LOW>;
+        SCREENKEY_PANEL_PROPERTIES
+    };
+
+    screenkey_lcd2: lcd@2 {
+        compatible = "sitronix,st7735r";
+        reg = <2>;
+        cmd-data-gpios = <SK_DC GPIO_ACTIVE_LOW>;
+        SCREENKEY_PANEL_PROPERTIES
+    };
+
+    screenkey_lcd3: lcd@3 {
+        compatible = "sitronix,st7735r";
+        reg = <3>;
+        cmd-data-gpios = <SK_DC GPIO_ACTIVE_LOW>;
+        SCREENKEY_PANEL_PROPERTIES
+    };
+};
+
+&pwm1 {
+    status = "okay";
+    pinctrl-0 = <&screenkey_pwm_default>;
+    pinctrl-1 = <&screenkey_pwm_sleep>;
+    pinctrl-names = "default", "sleep";
+};
+
+/* Unused DK peripherals whose default pins are reused above. */
+&spi1 {
+    status = "disabled";
+};
+
+&arduino_spi {
+    status = "disabled";
+};
+
+&pinctrl {
+    /* No MISO: the ScreenKey displays are write-only. */
+    screenkey_spi_default: screenkey_spi_default {
+        group1 {
+            psels = <SK_SCLK_PSEL>, <SK_DIN_PSEL>;
+        };
+    };
+
+    screenkey_spi_sleep: screenkey_spi_sleep {
+        group1 {
+            psels = <SK_SCLK_PSEL>, <SK_DIN_PSEL>;
+            low-power-enable;
+        };
+    };
+
+    screenkey_pwm_default: screenkey_pwm_default {
+        group1 {
+            psels = <SK_BL_PSEL>;
+        };
+    };
+
+    screenkey_pwm_sleep: screenkey_pwm_sleep {
+        group1 {
+            psels = <SK_BL_PSEL>;
+            low-power-enable;
+        };
+    };
+};

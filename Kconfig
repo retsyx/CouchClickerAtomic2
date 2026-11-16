@@ -1,0 +1,38 @@
+config CCA_SCREENKEY
+	bool "ScreenKey displays"
+	default y
+	depends on DT_HAS_CCA_SCREENKEYS_ENABLED
+	select DISPLAY
+	select PWM
+	help
+	  Drive the ScreenKey displays described by the "cca,screenkeys"
+	  devicetree node. Each press of a ScreenKey's switch toggles its face.
+
+if CCA_SCREENKEY
+
+config CCA_SCREENKEY_BACKLIGHT_PERCENT
+	int "Backlight brightness in percent"
+	range 0 100
+	default 100
+
+config CCA_SCREENKEY_RESET_INIT_PRIORITY
+	int "Shared display reset init priority"
+	default 80
+	help
+	  POST_KERNEL priority of the shared reset pulse. It must be lower
+	  (earlier) than DISPLAY_INIT_PRIORITY so the panels are reset before
+	  the display drivers initialize them.
+
+config CCA_SCREENKEY_THREAD_STACK_SIZE
+	int "Drawing thread stack size"
+	default 1024
+
+config CCA_SCREENKEY_THREAD_PRIORITY
+	int "Drawing thread priority"
+	default 10
+
+module = CCA_SCREENKEY
+module-str = ScreenKey
+source "subsys/logging/Kconfig.template.log_config"
+
+endif # CCA_SCREENKEY

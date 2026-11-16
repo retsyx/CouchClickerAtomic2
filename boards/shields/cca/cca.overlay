@@ -11,24 +11,37 @@
         zmk,physical-layout = &default_layout;
     };
 
+    // Matrix pins are board specific: see boards/<board>.overlay.
     kscan: kscan {
         compatible = "zmk,kscan-gpio-matrix";
         diode-direction = "col2row";
         wakeup-source;
+    };
 
-        col-gpios
-            = <&xiao_d 4 GPIO_ACTIVE_HIGH>
-            , <&xiao_d 1 GPIO_ACTIVE_HIGH>
-            , <&xiao_d 9 GPIO_ACTIVE_HIGH>
-            , <&xiao_d 3 GPIO_ACTIVE_HIGH>
-            , <&xiao_d 2 GPIO_ACTIVE_HIGH>
-            ;
+    // ScreenKey displays are board specific: see boards/<board>.overlay.
+    // Their switches are the F1-F4 keys, RC(0, 1) to RC(0, 4).
+    screenkeys: screenkeys {
+        compatible = "cca,screenkeys";
 
-        row-gpios
-            = <&xiao_d 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
-            , <&xiao_d 10 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
-            , <&xiao_d 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
-            ;
+        screenkey_0 {
+            display = <&screenkey_lcd0>;
+            key-position = <1>;
+        };
+
+        screenkey_1 {
+            display = <&screenkey_lcd1>;
+            key-position = <2>;
+        };
+
+        screenkey_2 {
+            display = <&screenkey_lcd2>;
+            key-position = <3>;
+        };
+
+        screenkey_3 {
+            display = <&screenkey_lcd3>;
+            key-position = <4>;
+        };
     };
 
     default_transform: default_transform {

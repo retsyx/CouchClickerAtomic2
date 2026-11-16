@@ -1,0 +1,30 @@
+/*
+ * Waveshare 0.85" ScreenKey panel: 128x128 IPS, ST7735 controller.
+ *
+ * Use inside each sitronix,st7735r node, after reg and cmd-data-gpios. The
+ * settings follow Waveshare's ESP-IDF panel initialization (inversion, gamma,
+ * MADCTL 0xc8, RGB565 and RAM offset (2, 3)). The panel takes ordinary
+ * RGB565 bytes despite MADCTL's BGR bit, hence rgb-is-inverted.
+ */
+#define SCREENKEY_PANEL_PROPERTIES                                             \
+    spi-max-frequency = <8000000>;                                             \
+    width = <128>;                                                             \
+    height = <128>;                                                            \
+    x-offset = <2>;                                                            \
+    y-offset = <3>;                                                            \
+    madctl = <0xc8>;                                                           \
+    colmod = <0x05>;                                                           \
+    inversion-on;                                                              \
+    rgb-is-inverted;                                                           \
+    frmctr1 = [05 3c 3c];                                                      \
+    frmctr2 = [05 3c 3c];                                                      \
+    frmctr3 = [05 3c 3c 05 3c 3c];                                             \
+    invctr = <0x03>;                                                           \
+    pwctr1 = [a4 04 84];                                                       \
+    pwctr2 = [c8];                                                             \
+    pwctr3 = [0d 00];                                                          \
+    pwctr4 = [8d 2a];                                                          \
+    pwctr5 = [8d ee];                                                          \
+    vmctr1 = <0x1d>;                                                           \
+    gamctrp1 = [0c 0a 06 00 1a 11 0b 0a 0b 0c 19 33 00 06 02 10];              \
+    gamctrn1 = [0d 0f 03 00 11 0a 06 08 09 0d 1c 3a 00 09 07 10];
